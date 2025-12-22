@@ -15,6 +15,7 @@ import { useAlert } from '@/hook/useAlert';
 import { useKeinkRunnable } from '@/api/keink';
 import useConfirmDialog from '@/hook/useConfirmDialog';
 import KeinkDialog from '@/component/Dialog/KeinkDialog';
+import { useI18n } from '@/hook/useI18n';
 
 const LoginPage = () => {
   const [token, setToken] = useState('');
@@ -26,12 +27,11 @@ const LoginPage = () => {
   const { data: keinkRes } = useKeinkRunnable();
   const [showKeinkDialog, setShowKeinkDialog] = useState(false);
   const { showConfirmDialog, ConfirmDialogComponent } = useConfirmDialog();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (cookie && storedToken) {
       getVersion(storedToken).then(() => {
-
-
         window.location.href = '/';
       }).catch(() => {
         setCookie('');
@@ -48,8 +48,6 @@ const LoginPage = () => {
     try {
       const resp = await getVersion(token);
 
-      console.log('resp', resp);
-
       const user = await getServiceAccountName(token);;
       setStoredToken(token);
       setCookie(user);
@@ -57,7 +55,7 @@ const LoginPage = () => {
 
       window.location.href = '/';
     } catch (e: any) {
-      error(e?.response?.data?.message || e?.message || 'Failed to login');
+      error(e?.response?.data?.message || e?.message || t('messages.error'));
       setTokenError('Invalid token');
     }
   };
@@ -74,12 +72,11 @@ const LoginPage = () => {
 
   const handleRunKeink = () => {
     showConfirmDialog({
-      title: "Run KubeEdge by Keink",
-      content: "Are you sure you want to run KubeEdge installation using Keink? This will start the installation process, and it might take some time to complete.",
+      title: t("login.installByKeink"),
+      content: t("login.keinkConfirm"),
       onConfirm: () => {
         setShowKeinkDialog(true);
       },
-      onCancel: () => { },
     })
   }
 
@@ -120,7 +117,8 @@ const LoginPage = () => {
 
       <TextField
         variant="outlined"
-        placeholder="Please enter token"
+        // 冲突解决部分：保留了 main 的国际化，同时也保留了你的 type 切换功能
+        placeholder={t('messages.pleaseEnterToken')}
         type={showToken ? 'text' : 'password'}
         InputProps={{
           startAdornment: (
@@ -164,7 +162,7 @@ const LoginPage = () => {
           },
         }}
       >
-        Login
+        {t('login.login')}
       </Button>
 
       {keinkRes?.ok && (
@@ -182,7 +180,7 @@ const LoginPage = () => {
             },
           }}
         >
-          Install KubeEdge By Keink
+          {t('login.installByKeink')}
         </Button>
       )}
 
