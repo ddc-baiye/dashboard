@@ -117,7 +117,6 @@ const LoginPage = () => {
 
       <TextField
         variant="outlined"
-        // 冲突解决部分：保留了 main 的国际化，同时也保留了你的 type 切换功能
         placeholder={t('messages.pleaseEnterToken')}
         type={showToken ? 'text' : 'password'}
         InputProps={{
